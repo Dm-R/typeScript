@@ -287,3 +287,39 @@ const seasons: IDictionary = {
 
 const summerMonths = seasons.summer;
 output.innerHTML += `</br>${summerMonths}`;
+
+// OOP TASK USE TYPE-SCRIPT
+
+// class EventManager {
+//   public listeners: Map<string, Project[] | Boss> = new Map();
+
+//   constructor(events: string[]) {
+//     // eslint-disable-next-line no-restricted-syntax
+//     for (const event of events) {
+//       this.listeners.set(event, []);
+//     }
+//   }
+
+//   subscribe(event: string, listeners: Boss | Project | Department | Project[]) {
+//     // eslint-disable-next-line no-restricted-syntax
+//     for (const listener of listeners) {
+//       this.listeners.get(event).push(listener);
+//     }
+//   }
+
+//   unsubscribe(event: string, listener: Boss | Project | Department) {
+//     const listeners = this.listeners.get(event).filter((curent: any) => curent !== listener);
+//     this.listeners.set(event, listeners);
+//   }
+
+//   notify(event: string, data?: null | Project[]) {
+//     this.listeners.get(event).forEach((listener) => listener.update(data));
+//   }
+// }
+
+const a: number = 7;
+// eslint-disable-next-line no-restricted-syntax
+// for (const i of a) {
+//   console.log(i);
+// }
+

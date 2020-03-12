@@ -501,11 +501,6 @@ class Boss {
   }
 }
 
-// interface IDepartment {
-//   addDeveloper(name: string): void;
-//   getName(): string;
-// }
-
 class Project {
   private boss: Boss;
 

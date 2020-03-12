@@ -1,3 +1,6 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-console */
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
@@ -288,38 +291,49 @@ const seasons: IDictionary = {
 const summerMonths = seasons.summer;
 output.innerHTML += `</br>${summerMonths}`;
 
+//
+
+
+//
+
+
 // OOP TASK USE TYPE-SCRIPT
 
-class EventManager {
 
+//
+
+
+//
+
+
+class EventManager {
   public listeners: Map<string, Array<any>> = new Map();
 
   constructor(events: string) {
     // eslint-disable-next-line no-restricted-syntax
-    const eventsArray = events.split('');
-    for (let event of eventsArray) {
+    const eventsArray = events.split(' ');
+    for (const event of eventsArray) {
       this.listeners.set(event, []);
     }
   }
 
-  subscribe(event: string, listener_s: Array<any> | Object) {
+  subscribe(event: string, listeners: Array<any> | Object): void {
     // eslint-disable-next-line no-restricted-syntax
-    if (listener_s instanceof Array) {
-      for (const listener of listener_s) {
+    if (listeners instanceof Array) {
+      for (const listener of listeners) {
         this.listeners.get(event).push(listener);
       }
     } else {
-      this.listeners.get(event).push(listener_s);
+      this.listeners.get(event).push(listeners);
     }
-    
   }
 
-  unsubscribe(event: string, listener: any) {
-    const listeners = this.listeners.get(event).filter((curent: any) => curent !== listener);
+  unsubscribe(event: string, listener: any): void {
+    const listeners = this.listeners.get(event).filter((curent) => curent !== listener);
     this.listeners.set(event, listeners);
   }
 
-  notify(event: string, data?: null | Project[]) {
+  notify(event: string, data?: null | Project[]): void {
     this.listeners.get(event).forEach((listener) => {
       if (listener instanceof Boss) {
         listener.update(data);
@@ -331,24 +345,29 @@ class EventManager {
 }
 
 class Company {
-
   private employedDevs: number = 0;
+
   private dismissedDevs: number = 0;
+
   private doneProjects = 0;
+
   private departments: Department[] = [];
+
   private newProjects: Project[] = [];
+
   private boss: Boss;
+
   public eventManager: EventManager;
 
   constructor(manager: EventManager) {
     this.eventManager = manager;
   }
 
-  unsubscribe(event: string, listener: any) {
+  unsubscribe(event: string, listener: any): void {
     this.eventManager.unsubscribe(event, listener);
   }
 
-  setBoss(boss: Boss) {
+  setBoss(boss: Boss): void {
     this.boss = boss;
     this.boss.setCompany(this);
     this.departments.forEach((dep) => {
@@ -358,10 +377,11 @@ class Company {
     this.eventManager.subscribe('generate', this.boss);
   }
 
-  generateNewProjects() {
+  generateNewProjects(): void {
     // it's better to pass countNewProj as a parameter into the method instead of creating it inside the method
     const countNewProj = Math.floor((Math.random() * 4) + 1);
     for (let i = 0; i < countNewProj; i += 1) {
+      // eslint-disable-next-line no-use-before-define
       this.newProjects.push(new Project(this.boss));
     }
     this.eventManager.subscribe('inc_day', this.newProjects);
@@ -369,129 +389,145 @@ class Company {
     this.newProjects = [];
   }
 
-  incDay() {
+  incDay(): void {
     this.eventManager.notify('inc_day', null);
   }
 
-  incEmployedDevs() {
+  incEmployedDevs(): void {
     this.employedDevs += 1;
   }
 
-  addDepartment(dep: Department) {
+  getDismissedDevs(): number {
+    return this.dismissedDevs;
+  }
+
+  addDepartment(dep: Department): void {
     this.departments.push(dep);
     this.boss.addDepartment(dep);
     dep.setBoss(this.boss);
     this.eventManager.subscribe('inc_day', dep);
   }
 
-  getEmployedDevs() {
+  getEmployedDevs(): number {
     return this.employedDevs;
   }
 
-  incDismissedDevs() {
-    return this.dismissedDevs;
+  incDismissedDevs(): void{
+    this.dismissedDevs += 1;
   }
 
-  incDoneProjects() {
+  incDoneProjects(): void {
     this.doneProjects += 1;
   }
 
-  getDoneProjects() {
+  getDoneProjects(): number {
     return this.doneProjects;
   }
 }
 
 class Boss {
-
   private projsInDevelopment: Map<Project, Developer[]> = new Map();
+
   public remainingProjects: Project[] = [];
+
   private departments: Department[] = [];
+
   public projectsToTest: Project[] = [];
+
   private company: Company;
 
-  setCompany(company: Company) {
+  setCompany(company: Company): void {
     this.company = company;
   }
 
-  joinDevToProj(dev: Developer, proj: Project) {
+  joinDevToProj(dev: Developer, proj: Project): void {
     proj.stopWaiting();
     if (this.projsInDevelopment.has(proj)) {
       this.projsInDevelopment.get(proj).push(dev);
-    }else {
+    } else {
       this.projsInDevelopment.set(proj, [dev]);
     }
   }
 
-  incDismissedDevs() {
+  incDismissedDevs(): void {
     this.company.incDismissedDevs();
   }
 
-  removeProject(proj: Project) {
-    let devs = this.projsInDevelopment.get(proj);
+  removeProject(proj: Project): void {
+    const devs = this.projsInDevelopment.get(proj);
     devs.forEach((dev) => dev.setFree());
     this.projsInDevelopment.delete(proj);
     this.company.unsubscribe('inc_day', proj);
     this.company.incDoneProjects();
   }
 
-  addDepartment(dep: Department) {
+  addDepartment(dep: Department): void {
     this.departments.push(dep);
   }
 
-  addRemainingProjs(projects: Project[]) {
+  addRemainingProjs(projects: Project[]): void {
     projects.forEach((proj) => proj.wait());
     this.remainingProjects = this.remainingProjects.concat(projects);
   }
 
-  update(projects: Project[]) {
-    if (this.remainingProjects) {
+  update(projects: Project[]): void {
+    if (this.remainingProjects.length) {
       this.employDevs();
       this.distrProjects(this.remainingProjects);
       this.remainingProjects = [];
     }
-    let projs = projects.concat(this.projectsToTest);
+    const projs = projects.concat(this.projectsToTest);
     this.projectsToTest = [];
     this.distrProjects(projs);
   }
 
-  distrProjects(projectsToDistr: Project[]) {
+  distrProjects(projectsToDistr: Project[]): void {
     this.departments.forEach((dep) => {
-      let projects = projectsToDistr.filter((proj) => proj.getType() === dep.getName());
-      dep.distributeByDevs(projectsToDistr);
-    })
-  } 
+      const projects = projectsToDistr.filter((proj) => proj.getType() === dep.getName());
+      dep.distributeByDevs(projects);
+    });
+  }
 
-  addProjectToTest(project: Project) {
+  addProjectToTest(project: Project): void {
     this.projectsToTest.push(project);
   }
 
-  employDevs() {
+  employDevs(): void {
     this.departments.forEach((dep) => {
-      let projects = this.remainingProjects.filter((rProj) => rProj.getType() === dep.getName());
-      projects.forEach((proj) => dep.addDeveloper());
+      const projects = this.remainingProjects.filter((rProj) => rProj.getType() === dep.getName());
+      projects.forEach(() => dep.addDeveloper());
       this.company.incEmployedDevs();
-    })
+    });
   }
-
 }
+
+// interface IDepartment {
+//   addDeveloper(name: string): void;
+//   getName(): string;
+// }
 
 class Project {
   private boss: Boss;
+
   private complexity: number = Math.floor(Math.random() * 3 + 1);
-  private type: string = Math.floor(Math.random() * 2 + 1) == 1 ? 'web' : 'mobile';
+
+  private type: string = Math.floor(Math.random() * 2 + 1) === 1 ? 'web' : 'mobile';
+
   private daysOfDevelopment: number = 0;
+
   private countDevs: number = 0;
+
   private waiting: boolean = true;
 
   constructor(boss: Boss) {
     this.boss = boss;
   }
- 
-  wait() {
+
+  wait(): void {
     this.waiting = true;
   }
 
-  stopWaiting() {
+  stopWaiting(): void {
     this.waiting = false;
   }
 
@@ -507,11 +543,11 @@ class Project {
     return this.type;
   }
 
-  setType(type: string) {
+  setType(type: string): void {
     this.type = type;
   }
 
-  incCountDevelopers() {
+  incCountDevelopers(): void {
     this.countDevs += 1;
   }
 
@@ -523,7 +559,7 @@ class Project {
     return Math.ceil(this.complexity / this.countDevs);
   }
 
-  update() {
+  update(): void {
     if (!this.isWaiting()) {
       this.daysOfDevelopment += 1;
       if (!(this.getType() === 'qa')) {
@@ -533,39 +569,38 @@ class Project {
           this.daysOfDevelopment = 0;
           this.boss.addProjectToTest(this);
         }
-      }else {
-        if (this.daysOfDevelopment === 1) {
-          this.boss.removeProject(this);
-        }
+      } else if (this.daysOfDevelopment === 1) {
+        this.boss.removeProject(this);
       }
     }
   }
-   
 }
 
 class Developer {
-
   public profession: string;
+
   private freeDays: number = 0;
+
   private countDoneProjects: number = 0;
+
   private free: boolean = true;
 
   constructor(profession: string) {
     this.profession = profession;
   }
 
-  incDay() {
+  incDay(): void {
     if (this.free) {
       this.freeDays += 1;
     }
   }
 
-  setProject() {
+  setProject(): void {
     this.free = false;
     this.freeDays = 0;
   }
 
-  setFree() {
+  setFree(): void {
     this.free = true;
     this.countDoneProjects += 1;
   }
@@ -584,12 +619,103 @@ class Developer {
 }
 
 class Department {
-
   public developers: Developer[] = [];
-  private boss: Boss;
 
-  
+  protected boss: Boss;
 
+  protected name: string;
+
+  constructor(name?: string) {
+    this.name = name;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  addDeveloper():void {
+    const dev: Developer = new Developer(this.name);
+    this.developers.push(dev);
+  }
+
+  setBoss(boss: Boss): void {
+    this.boss = boss;
+  }
+
+  update(): void {
+    this.checkDevsToDismiss();
+    this.developers.forEach((dev) => dev.incDay());
+  }
+
+  checkDevsToDismiss(): void {
+    const devsToDismiss = this.developers.filter((dev) => dev.getFreeDays() > 3);
+    if (devsToDismiss.length) {
+      devsToDismiss.sort((dev1, dev2) => dev1.getCountDoneProjects() - dev2.getCountDoneProjects());
+      const dismissedDev = devsToDismiss.pop();
+      this.boss.incDismissedDevs();
+      this.developers = this.developers.filter((dev) => dev !== dismissedDev);
+    }
+  }
+
+  distributeByDevs(projects: Project[]): void {
+    const freeDevs = this.developers.filter((dev) => dev.isFree());
+    while (projects.length && freeDevs.length) {
+      const dev: Developer = freeDevs.pop();
+      dev.setProject();
+      const proj: Project = projects.pop();
+      proj.incCountDevelopers();
+      this.boss.joinDevToProj(dev, proj);
+    }
+    if (projects.length) {
+      this.boss.addRemainingProjs(projects);
+    }
+  }
 }
 
-<string, Project[] | Boss>
+class Mobile extends Department {
+  getName(): string {
+    return 'mobile';
+  }
+
+  distributeByDevs(projects: Project[]): void {
+    const freeDevs: Developer[] = this.developers.filter((dev) => dev.isFree());
+    while (projects.length && freeDevs.length) {
+      const dev: Developer = freeDevs.pop();
+      dev.setProject();
+      const proj: Project = projects.pop();
+      proj.incCountDevelopers();
+      this.boss.joinDevToProj(dev, proj);
+      if (proj.getComplexity() > proj.getCountDevelopers()) {
+        projects.unshift(proj);
+      }
+    }
+    if (projects.length) {
+      const projectsToRemain: Project[] = projects.filter((proj) => proj.getCountDevelopers() === 0);
+      this.boss.addRemainingProjs(projectsToRemain);
+    }
+  }
+}
+
+const simulate = (days: number): void => {
+  const manager: EventManager = new EventManager('inc_day generate');
+  const company: Company = new Company(manager);
+  const boss: Boss = new Boss();
+  const web: Department = new Department('web');
+  const mobile: Mobile = new Mobile();
+  const qa: Department = new Department('qa');
+
+  company.setBoss(boss);
+  company.addDepartment(web);
+  company.addDepartment(mobile);
+  company.addDepartment(qa);
+
+  for (let i = 0; i < days; i += 1) {
+    company.generateNewProjects();
+    company.incDay();
+  }
+  console.log(`Статистика за ${days} дней:`);
+  console.log(`Выполнено проектов: ${company.getDoneProjects()};`);
+  console.log(`Принято программистов: ${company.getEmployedDevs()};`);
+  console.log(`Уволенно программистов: ${company.getDismissedDevs()}.`);
+};
+simulate(150);
